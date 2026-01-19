@@ -532,6 +532,10 @@
             // [NEW] 공식 일본어 명칭 검색 URL
             // 검색어: [게임명] game official japanese title
             const jpNameSearchUrl = `https://www.google.com/search?q=${encodedName}+game+official+japanese+title`;
+            
+            // [NEW] 공식 영어 명칭 검색 URL (일본어 원제일 경우)
+            // 검색어: [게임명] english title
+            const enNameSearchUrl = `https://www.google.com/search?q=${encodedName}+english+title`;
 
             // 영문일 경우 표시할 버튼 HTML 생성
             let translationBtn = '';
@@ -542,6 +546,9 @@
                 translationBtn = `<a href="${jpNameSearchUrl}" target="_blank" class="search-btn btn-translate">🇯🇵 日本語名を探す</a>`;
                 cardClass += ' card-english'; // 스타일 변경용 클래스 추가
                 englishTag = '<span class="english-tag">(English Detected)</span>';
+            } else {
+                // 일본어(비영어)일 경우 -> 영어 제목 찾기 버튼
+                translationBtn = `<a href="${enNameSearchUrl}" target="_blank" class="search-btn btn-translate">🇺🇸 英語名を探す</a>`;
             }
 
             const cardHtml = `
