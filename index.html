@@ -86,7 +86,7 @@
             box-sizing: border-box;
         }
 
-        /* 추가 제외 키워드 입력칸 스타일 (높이 작게) */
+        /* 추가 제외 키워드 입력칸 스타일 */
         .small-textarea {
             height: 60px;
             margin-top: 10px;
@@ -110,7 +110,7 @@
             color: #1976D2;
         }
 
-        /* 제외된 기업 리스트 영역 스타일 (빨간색 테마) */
+        /* 제외된 기업 리스트 영역 스타일 */
         .excluded-section {
             background: #ffebee;
             padding: 15px;
@@ -150,7 +150,7 @@
             background-color: #C2185B;
         }
 
-        /* 필터 버튼 색상은 파란색 계열로 구분 */
+        /* 필터 버튼 */
         .filter-btn {
             background-color: #2196F3;
             color: white;
@@ -218,7 +218,12 @@
 
         .card-company {
             border-left: 5px solid #2196F3;
-            /* 필터 탭은 파란색 */
+        }
+
+        /* 영문 감지시 카드 스타일 */
+        .card-english {
+            border-left: 5px solid #6200ea !important; /* 보라색 강조 */
+            background-color: #f3e5f5; /* 아주 연한 보라색 배경 */
         }
 
         .game-info {
@@ -230,6 +235,13 @@
             font-size: 1.1em;
             color: #2c3e50;
             display: block;
+        }
+
+        .english-tag {
+            font-size: 0.8em;
+            color: #6200ea;
+            font-weight: bold;
+            margin-left: 5px;
         }
 
         .btn-group {
@@ -258,7 +270,6 @@
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
 
-        /* 삭제 버튼 스타일 추가 */
         button.btn-delete {
             background-color: #fff;
             color: #e53935;
@@ -276,38 +287,16 @@
         }
 
         /* 버튼 색상 */
-        .btn-series {
-            background-color: #8e44ad;
-        }
-
-        .btn-wiki {
-            background-color: #7f8c8d;
-        }
-
-        .btn-total {
-            background-color: #d32f2f;
-            box-shadow: 0 2px 0 #b71c1c;
-        }
-
-        .btn-meta {
-            background-color: #f39c12;
-        }
-
-        /* 기업 필터용 버튼 */
-        .btn-check-nation {
-            background-color: #00BCD4;
-        }
+        .btn-translate { background-color: #6200ea; } /* 보라색 (번역) */
+        .btn-series { background-color: #8e44ad; }
+        .btn-wiki { background-color: #7f8c8d; }
+        .btn-total { background-color: #d32f2f; box-shadow: 0 2px 0 #b71c1c; }
+        .btn-meta { background-color: #f39c12; }
+        .btn-check-nation { background-color: #00BCD4; }
 
         @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         
         .section-label {
@@ -334,7 +323,6 @@
             <label class="section-label">▼ 対象の企業リスト</label>
             <textarea id="companyInput" placeholder="企業リストをここに貼り付けてください...&#13;&#10;（例）&#13;&#10;日本ファルコム&#13;&#10;任天堂&#13;&#10;Ubisoft&#13;&#10;カプコン&#13;&#10;フロム・ソフトウェア"></textarea>
             
-            <!-- 기능 추가 1: 사용자 지정 제외 키워드 입력란 -->
             <label class="section-label" style="margin-top:15px;">▼ 追加で除外したいキーワード（カンマ区切り、または改行）</label>
             <textarea id="customKeywords" class="small-textarea" placeholder="追加で除外したい単語を入力してください。&#13;&#10;例: Holdings, Partners, 製作委員会, 株式会社..."></textarea>
             
@@ -344,10 +332,8 @@
             </div>
         </div>
 
-        <!-- 결과 요약 및 휴지통 토글 버튼 -->
         <div id="filterSummary" style="margin-bottom: 15px; display:none;"></div>
 
-        <!-- 기능 추가 2: 제외된 기업 리스트 (Trash Bin) -->
         <div id="excludedSection" class="excluded-section">
             <h3>除外された企業リスト (誤判定チェック用)</h3>
             <div id="excludedList" class="excluded-list-content"></div>
@@ -366,7 +352,7 @@
     <!-- Tab 2: 게임 리서치 -->
     <div id="tab-research" class="tab-content">
         <div class="input-section">
-            <textarea id="gameInput" placeholder="ゲーム名をここに入力してください...&#13;&#10;（例）&#13;&#10;ドラゴンクエストXI&#13;&#10;ファイナルファンタジーXV&#13;&#10;ペルソナ5"></textarea>
+            <textarea id="gameInput" placeholder="ゲーム名をここに入力してください...&#13;&#10;（例）&#13;&#10;Yakuza: Like a Dragon (英語でもOK)&#13;&#10;ドラゴンクエストXI&#13;&#10;Persona 5"></textarea>
             <div>
                 <button class="generate-btn" onclick="generateDashboard()">リスト生成</button>
                 <button class="clear-btn" onclick="clearInput('gameInput', 'resultArea')">リセット</button>
@@ -379,7 +365,6 @@
 </div>
 
 <script>
-    // 탭 전환 함수
     function openTab(tabName) {
         document.querySelectorAll('.tab-content').forEach(content => {
             content.classList.remove('active');
@@ -397,7 +382,7 @@
     // [Tab 1] 기업 필터링 함수
     function filterCompanies() {
         const input = document.getElementById('companyInput').value;
-        const customInput = document.getElementById('customKeywords').value; // 추가 키워드 가져오기
+        const customInput = document.getElementById('customKeywords').value;
         
         const resultArea = document.getElementById('filterResultArea');
         const copySection = document.getElementById('copySection');
@@ -411,59 +396,34 @@
             return;
         }
 
-        // 기본 제외 키워드
         let excludedKeywords = [
-            // --- 기존 16개 일본 대기업 ---
-            'ソニー', 'SIE', 'SONY',
-            '任天堂', 'Nintendo',
-            'バンダイナムコ', 'Bandai Namco',
-            'スクウェア・エニックス', 'スクエニ', 'Square Enix',
-            'セガ', 'Sega',
-            'コナミ', 'Konami',
-            'カプコン', 'Capcom',
-            'ポケモン', 'Pokemon', 'Pokémon',
-            'コーエーテクモ', 'Koei Tecmo',
-            'マーベラス', 'Marvelous',
-            'フロム・ソフトウェア', 'From Software',
-            'KADOKAWA',
-            'レベルファイブ', 'Level-5',
-            'アトラス', 'Atlas', 'ATLUS',
-            'SNK',
-            'D3', 'D3パブリッシャー',
-            'サイゲームズ', 'Cygames',
-            
-            // --- 주요 해외 기업 ---
-            'Microsoft', 'マイクロソフト', 'Xbox',
-            'Bethesda', 'ベセスダ', 'Zenimax',
+            'ソニー', 'SIE', 'SONY', '任天堂', 'Nintendo',
+            'バンダイナムコ', 'Bandai Namco', 'スクウェア・エニックス', 'スクエニ', 'Square Enix',
+            'セガ', 'Sega', 'コナミ', 'Konami', 'カプコン', 'Capcom',
+            'ポケモン', 'Pokemon', 'Pokémon', 'コーエーテクモ', 'Koei Tecmo',
+            'マーベラス', 'Marvelous', 'フロム・ソフトウェア', 'From Software', 'KADOKAWA',
+            'レベルファイブ', 'Level-5', 'アトラス', 'Atlas', 'ATLUS',
+            'SNK', 'D3', 'D3パブリッシャー', 'サイゲームズ', 'Cygames',
+            'Microsoft', 'マイクロソフト', 'Xbox', 'Bethesda', 'ベセスダ', 'Zenimax',
             'Activision', 'Blizzard', 'アクティビジョン', 'ブリザード',
             'Electronic Arts', 'EA', 'エレクトロニック・アーツ',
             'Ubisoft', 'ユービーアイソフト', 'Ubi',
             'Take-Two', '2K', 'Rockstar', 'ロックスター',
-            'Valve', 'バルブ',
-            'Epic Games', 'エピック',
-            'Warner Bros', 'ワーナー',
-            'Tencent', 'テンセント',
-            'NetEase', 'ネットイース',
-            'Hoyoverse', 'miHoYo', 'ミホヨ',
-            'Nexon', 'ネクソン',
-            'NCSoft',
-            'Krafton',
-            'Unity',
-            'Riot Games', 'ライアット',
-            'Mojang', 'モージャン',
-            'Supercell', 'スーパーセル',
-            'King', 'キング'
+            'Valve', 'バルブ', 'Epic Games', 'エピック',
+            'Warner Bros', 'ワーナー', 'Tencent', 'テンセント',
+            'NetEase', 'ネットイース', 'Hoyoverse', 'miHoYo', 'ミホヨ',
+            'Nexon', 'ネクソン', 'NCSoft', 'Krafton', 'Unity',
+            'Riot Games', 'ライアット', 'Mojang', 'モージャン',
+            'Supercell', 'スーパーセル', 'King', 'キング'
         ];
 
-        // 1. 사용자 지정 키워드 추가 로직
         if (customInput.trim()) {
-            // 콤마나 줄바꿈으로 분리
             const customKeywords = customInput.split(/[\n,]+/).map(k => k.trim()).filter(k => k !== '');
             excludedKeywords = excludedKeywords.concat(customKeywords);
         }
 
         resultArea.innerHTML = '';
-        excludedListDiv.innerHTML = ''; // 초기화
+        excludedListDiv.innerHTML = '';
 
         const lines = input.split('\n').filter(line => line.trim() !== '');
 
@@ -473,21 +433,16 @@
 
         lines.forEach(line => {
             const text = line.trim();
-            // 키워드 포함 여부 확인
             const isExcluded = excludedKeywords.some(keyword => text.toUpperCase().includes(keyword.toUpperCase()));
 
             if (isExcluded) {
                 removedCount++;
                 removedCompaniesList.push(text);
             } else {
-                // 살아남은 기업
                 remainingCompanies.push(text);
-
-                // 개별 확인용 카드 생성
                 const encodedText = encodeURIComponent(text);
                 const checkNationUrl = `https://www.google.com/search?q=${encodedText}+%E3%81%A9%E3%81%93%E3%81%AE%E5%9B%BD+%E6%97%A5%E6%9C%AC%E4%BC%81%E6%A5%AD`;
 
-                // [UPDATE] 삭제 버튼 추가
                 const cardHtml = `
                 <div class="card card-company">
                     <div class="game-info">
@@ -503,21 +458,17 @@
             }
         });
 
-        // 결과 리스트를 텍스트박스에 채워넣기
         finalListTextarea.value = remainingCompanies.join('\n');
         copySection.style.display = 'block';
 
-        // 2. 제외된 기업(휴지통) 처리 로직
         if (removedCompaniesList.length > 0) {
-            excludedListDiv.innerHTML = removedCompaniesList.join(', '); // 콤마로 구분해서 표시
-            // 기본은 숨겨두고 버튼으로 토글
+            excludedListDiv.innerHTML = removedCompaniesList.join(', ');
             excludedSection.style.display = 'none'; 
         } else {
             excludedListDiv.innerHTML = '除外された企業はありません。';
             excludedSection.style.display = 'none';
         }
 
-        // 요약 메시지 표시 (Count ID 추가)
         summaryDiv.style.display = 'block';
         summaryDiv.innerHTML = `
         <div style="padding:10px; color:#333; font-weight:bold; background:#e0f7fa; border-radius:5px; border:1px solid #b2ebf2; display:flex; justify-content:space-between; align-items:center;">
@@ -527,27 +478,22 @@
         `;
     }
 
-    // [NEW] 개별 기업 삭제 및 리스트 동기화 함수
     function deleteCompany(btn) {
-        // 1. 카드 제거
         const card = btn.closest('.card');
         const companyName = card.querySelector('.game-name').innerText;
         card.remove();
 
-        // 2. 텍스트 박스에서 제거
         const textarea = document.getElementById('finalCompanyList');
         const lines = textarea.value.split('\n');
         const newLines = lines.filter(line => line.trim() !== companyName);
         textarea.value = newLines.join('\n');
 
-        // 3. 카운트 업데이트
         const countSpan = document.getElementById('remainingCount');
         if (countSpan) {
             countSpan.innerText = newLines.length;
         }
     }
 
-    // 제외된 리스트 토글 함수
     function toggleExcluded() {
         const section = document.getElementById('excludedSection');
         if (section.style.display === 'none') {
@@ -574,21 +520,40 @@
             const gameName = game.trim();
             const encodedName = encodeURIComponent(gameName);
 
-            // URL 생성
+            // [NEW] 영문(ASCII) 감지 정규식: 한글/일본어가 없는 경우 영어로 간주
+            // (특수문자 포함 ASCII 범위 내 문자열)
+            const isEnglish = !gameName.match(/[^\x00-\x7F]/);
+
             const seriesUrl = `https://www.google.com/search?q=${encodedName}+%E3%82%B7%E3%83%AA%E3%83%BC%E3%82%BA+%E7%A8%AE%E9%A1%9E+wiki`;
             const wikiUrl = `https://ja.wikipedia.org/w/index.php?search=${encodedName}`;
             const totalSalesUrl = `https://www.google.com/search?q=${encodedName}+%E3%82%B7%E3%83%AA%E3%83%BC%E3%82%BA+%E7%B4%AF%E8%A8%88%E8%B2%A9%E5%A3%B2%E6%9C%AC%E6%95%B0+sales`;
             const metaUrl = `https://www.google.com/search?q=${encodedName}+metacritic+score`;
 
+            // [NEW] 공식 일본어 명칭 검색 URL
+            // 검색어: [게임명] game official japanese title
+            const jpNameSearchUrl = `https://www.google.com/search?q=${encodedName}+game+official+japanese+title`;
+
+            // 영문일 경우 표시할 버튼 HTML 생성
+            let translationBtn = '';
+            let cardClass = 'card';
+            let englishTag = '';
+
+            if (isEnglish) {
+                translationBtn = `<a href="${jpNameSearchUrl}" target="_blank" class="search-btn btn-translate">🇯🇵 日本語名を探す</a>`;
+                cardClass += ' card-english'; // 스타일 변경용 클래스 추가
+                englishTag = '<span class="english-tag">(English Detected)</span>';
+            }
+
             const cardHtml = `
-            <div class="card">
+            <div class="${cardClass}">
                 <div class="game-info">
-                    <span class="game-name">${gameName}</span>
+                    <span class="game-name">${gameName} ${englishTag}</span>
                 </div>
                 <div class="btn-group">
+                    ${translationBtn}
                     <a href="${seriesUrl}" target="_blank" class="search-btn btn-series">シリーズ判別</a>
                     <a href="${totalSalesUrl}" target="_blank" class="search-btn btn-total">シリーズ累計合計</a>
-                    <a href="${wikiUrl}" target="_blank" class="search-btn btn-wiki">(One-Shot) Wiki</a>
+                    <a href="${wikiUrl}" target="_blank" class="search-btn btn-wiki">Wiki</a>
                     <a href="${metaUrl}" target="_blank" class="search-btn btn-meta">メタスコア</a>
                 </div>
             </div>
@@ -600,7 +565,7 @@
     function copyToClipboard() {
         const copyText = document.getElementById("finalCompanyList");
         copyText.select();
-        copyText.setSelectionRange(0, 99999); // 모바일 대응
+        copyText.setSelectionRange(0, 99999);
         document.execCommand("copy");
         alert("コピーしました！: \n" + copyText.value);
     }
